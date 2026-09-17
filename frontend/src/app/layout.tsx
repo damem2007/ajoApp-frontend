@@ -1,3 +1,5 @@
+import { SessionProvider } from "@/providers/session-provider";
+import { ToastProvider } from "@/providers/toast-provider";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Ajo | Your people. Your circle.",
@@ -12,7 +14,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <link rel="stylesheet" href="/assets/marketplace-fonts.css" />
         <link rel="stylesheet" href="/assets/marketplace-theme.css" />
       </head>
-      <body>{children}</body>
+      <body>
+        <ToastProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ToastProvider>
+      </body>
     </html>
   );
 }

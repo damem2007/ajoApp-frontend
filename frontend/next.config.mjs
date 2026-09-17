@@ -1,4 +1,4 @@
 export default {
-  // Existing workflow controllers initialize once per document during migration.
-  reactStrictMode: false,
+  reactStrictMode: true,
+  distDir: process.env.AJO_NEXT_DIST_DIR || ".next",
 };

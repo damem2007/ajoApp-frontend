@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { cmsApi } from "@/lib/api/cms";
+import { authApi } from "@/lib/api/auth";
+import type { CmsState, RevisionSummary } from "@/lib/cms-types";
 type Value = string | Value[] | { [key: string]: Value };
 const friendly = (key: string) =>
   ({
@@ -104,22 +106,24 @@ function Field({
   );
 }
 export default function CmsEditor() {
-  const [state, setState] = useState<any>(null),
+  const [state, setState] = useState<CmsState | null>(null),
     [working, setWorking] = useState<{ [key: string]: Value }>({}),
-    [history, setHistory] = useState<any[]>([]),
+    [history, setHistory] = useState<RevisionSummary[]>([]),
     [role, setRole] = useState(""),
     [dirty, setDirty] = useState(false),
     [reason, setReason] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false);
-  async function adopt(next: any) {
+  async function adopt(next: CmsState) {
     setState(next);
-    setWorking(structuredClone(next.draft.content));
+    setWorking(
+      structuredClone(next.draft.content) as unknown as Record<string, Value>,
+    );
     setDirty(false);
-    setHistory(await api("/admin/content/home/revisions"));
+    setHistory(await cmsApi.history());
   }
   useEffect(() => {
-    Promise.all([api("/me"), api("/admin/content/home")])
+    Promise.all([authApi.me(), cmsApi.state()])
       .then(async ([me, next]) => {
         setRole(me.role);
         await adopt(next);
@@ -141,29 +145,11 @@ export default function CmsEditor() {
     if (reason.trim().length < 3)
       throw Error("Add a change note of at least three characters.");
   }
-  async function preview() {
-    const popup = window.open("about:blank", "ajo-content-preview");
-    if (!popup) {
+  function preview() {
+    if (!window.open("/backoffice/cms/preview", "ajo-content-preview"))
       setNotice("Allow this site to open a preview window.");
-      return;
-    }
-    try {
-      const session = JSON.parse(
-          sessionStorage.getItem("ajoSession") || "null",
-        ),
-        response = await fetch("/api/v1/admin/content/home/preview", {
-          headers: { Authorization: "Bearer " + session?.access_token },
-        });
-      if (!response.ok)
-        throw Error("Please sign in again to preview the draft.");
-      const url = URL.createObjectURL(await response.blob());
-      popup.location.href = url;
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch (e) {
-      popup.close();
-      setNotice(e instanceof Error ? e.message : "Please try again.");
-    }
   }
+
   return (
     <section>
       <h2>Website content</h2>
@@ -195,15 +181,7 @@ export default function CmsEditor() {
                 action(async () => {
                   note();
                   await adopt(
-                    await api(
-                      "/admin/content/home/draft",
-                      {
-                        content: working,
-                        expected_draft: state.draft.id,
-                        reason,
-                      },
-                      "PUT",
-                    ),
+                    await cmsApi.save(working, state.draft.id, reason),
                   );
                 })
               }
@@ -220,11 +198,11 @@ export default function CmsEditor() {
                   action(async () => {
                     note();
                     await adopt(
-                      await api("/admin/content/home/publish", {
-                        revision_id: state.draft.id,
-                        expected_published: state.published.id,
+                      await cmsApi.publish(
+                        state.draft.id,
+                        state.published.id,
                         reason,
-                      }),
+                      ),
                     );
                   })
                 }
@@ -273,11 +251,11 @@ export default function CmsEditor() {
                       action(async () => {
                         note();
                         await adopt(
-                          await api("/admin/content/home/restore", {
-                            revision_id: r.id,
-                            expected_published: state.published.id,
+                          await cmsApi.restore(
+                            r.id,
+                            state.published.id,
                             reason,
-                          }),
+                          ),
                         );
                       })
                     }

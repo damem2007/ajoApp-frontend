@@ -1,8 +1,10 @@
 "use client";
+import type { MarketingContent } from "@/lib/cms-types";
 import { useState, useEffect } from "react";
-import { amount, catalogue, Circle } from "@/lib/api";
+import {catalogue,Circle} from "@/lib/api/marketplace";
+import {amount} from "@/lib/money";
 import { frequencies } from "@/lib/frequencies";
-export default function Home({ content: c }: { content: any }) {
+export default function Home({ content: c }: { content: MarketingContent }) {
   const [contribution, setContribution] = useState(200),
     [members, setMembers] = useState(6),
     [turn, setTurn] = useState(3),
@@ -25,7 +27,8 @@ export default function Home({ content: c }: { content: any }) {
       (n % 100 >= 11 && n % 100 <= 13
         ? "th"
         : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
-  const label = (name: string) => c.calculator[name];
+  const label = (name: keyof MarketingContent["calculator"]) =>
+    c.calculator[name];
   return (
     <>
       <link rel="stylesheet" href="/assets/home.css" />
@@ -219,7 +222,7 @@ export default function Home({ content: c }: { content: any }) {
             <h2>{c.how.title}</h2>
             <p className="section-lead">{c.how.body}</p>
             <div className="steps">
-              {c.how.steps.map((s: any, i: number) => (
+              {c.how.steps.map((s, i) => (
                 <article key={i}>
                   <span className="step-number">{i + 1}</span>
                   <h3>{s.title}</h3>
@@ -235,7 +238,7 @@ export default function Home({ content: c }: { content: any }) {
             <p className="section-lead">{c.safeguards.body}</p>
           </div>
           <div className="guard-list">
-            {c.safeguards.items.map((s: any, i: number) => (
+            {c.safeguards.items.map((s, i) => (
               <article key={i}>
                 <svg
                   width="24"
@@ -332,7 +335,7 @@ export default function Home({ content: c }: { content: any }) {
         <section className="faq wrap">
           <h2>{c.faq.title}</h2>
           <div className="faq-list">
-            {c.faq.items.map((f: any, i: number) => (
+            {c.faq.items.map((f, i) => (
               <details key={i} open={i === 0}>
                 <summary>{f.question}</summary>
                 <p>{f.answer}</p>

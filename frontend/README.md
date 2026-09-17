@@ -1,11 +1,21 @@
 # Ajo Next.js frontend
 
-Run FastAPI on port 8000 from the repository root, then run `npm install` and `npm run dev` here. Visit http://127.0.0.1:3000. Set `AJO_API_ORIGIN` to change the server API target; browser requests use the same-origin proxy, so tokens and provider credentials are never placed in public environment variables.
+Run FastAPI on port 8000 from the repository root, then `npm install` and `npm run dev` in this folder. Visit http://127.0.0.1:3000. `AJO_API_ORIGIN` configures the server-side same-origin API proxy. Do not put backend credentials in public environment variables.
 
-App Router pages: `/` (published CMS content), `/marketplace` (shared public catalogue), `/app` (member workspace and back office), `/terms`, `/privacy`.
+## Human-maintainable boundaries
 
-React components: `Home`, `Marketplace`, `CmsEditor`, `Workspace`, `Legal`. `src/lib/api.ts` centralizes the public catalogue and authenticated API calls; `src/lib/frequencies.ts` defines the eight supported frequency labels. Both public and signed-in React marketplaces mount the same component and load the same `/api/v1/public/marketplace` catalogue. The backend checks eligibility, identity, trust, concurrent commitments and capacity at join time. Sandbox examples appear in both views and cannot be joined.
+- `src/app`: App Router URLs and member/staff layouts. Public pages include `/`, `/marketplace`, `/terms`, `/privacy`, `/sign-in`, `/register`.
+- `/app/circles`, `/app/account`, `/app/invitations`, `/app/marketplace`, `/app/notifications`, `/app/trust`, `/app/reports`: native React member workflows.
+- `/backoffice`: native administrative modules. CMS is `/backoffice/cms`; draft preview uses `/backoffice/cms/preview` and authenticated JSON.
+- `src/components`: domain components for account, circles and backoffice, shared navigation/forms/data views.
+- `src/lib/api`: named typed resources for auth, circles/contracts, account, marketplace, notifications, administration and CMS. `client.ts` owns transport, coordinated token refresh, field errors, multipart uploads and binary downloads.
+- `src/providers`: shared session and toast state. Backend authorization remains authoritative.
+- `src/lib/frequencies.ts`: eight requirement frequency choices shared across screens.
 
-The member/workflow controllers in `public/assets/workspace/` (split into core, auth, circles, account, notifications, backoffice and bootstrap) are retained behind `Workspace` during migration to preserve circle contracts, KYC, MFA, notifications and operational workflows. They are plain JavaScript controllers, not yet native React components. The landing page, marketplace, calculator, legal pages and CMS are native React. All client assets now belong to this frontend folder. FastAPI's historical HTML URLs remain compatible during rollout; port 3000 is the new frontend entry point.
+Both marketplaces mount the same React component and call `/api/v1/public/marketplace`. Eligibility is checked when joining. Sandbox examples cannot be joined. New circle setup sends `contribution_minor`; backend preview derives and validates payouts using actual calendar dates before draft creation. Member capacity is fixed at setup.
 
-`npm run typecheck` and `npm run build` validate the frontend. The Python service remains responsible for all domain rules, staff authorization, audit records and database migrations.
+`/app?view=...` URLs redirect to native routes for bookmark compatibility. No native route loads the legacy workspace controllers or injects backend HTML. Historical Python HTML handlers and files remain available solely as compatibility material; their removal was blocked by automatic approval review. Use port 3000 as the frontend entry point and configure `AJO_FRONTEND_ORIGIN=http://127.0.0.1:3000` on FastAPI.
+
+## Verification
+
+`npm run typecheck`, `npm run build`; browser tests in `tests/next-*-ui.cjs` use `AJO_UI_PORT` (default 3000) and `AJO_PLAYWRIGHT_MODULE`. Browser mutations use intercepted fictional fixtures. FastAPI sandbox regression tests run separately with pytest and isolated databases. Keep `AJO_DEMO_MODE=true` for sandbox testing.
