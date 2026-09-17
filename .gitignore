@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.db
+*.db-*
+.ajo-data/
+.env
+.DS_Store
+*.egg-info/
+tmp/
+
+frontend/node_modules/
+frontend/.next/
+frontend/*.tsbuildinfo

@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/ajo-fraunces-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/assets/ajo-fraunces-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/assets/ajo-fraunces-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/assets/ajo-fraunces-700.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/ajo-inter-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/assets/ajo-inter-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/assets/ajo-inter-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/assets/ajo-inter-700.ttf) format('truetype');
+}
