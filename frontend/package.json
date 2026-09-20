@@ -28,7 +28,6 @@
     "@types/react-dom": "^19.2.0",
     "prettier": "^3.9.7",
     "typescript": "^5.9.3",
-    "playwright": "^1.62.1",
-    "openapi-typescript": "^7.10.1"
+    "playwright": "^1.62.1"
   }
 }
