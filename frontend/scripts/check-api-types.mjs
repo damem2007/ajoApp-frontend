@@ -16,8 +16,8 @@ try {
     env: { ...process.env, PYTHONPATH: resolve(root, "backend") },
   });
   execFileSync(
-    resolve(process.cwd(), "node_modules/.bin/openapi-typescript"),
-    [schema, "-o", expected],
+    "npx",
+    ["--yes", "openapi-typescript@7.10.1", schema, "-o", expected],
     { cwd: process.cwd(), stdio: "inherit" },
   );
   const current = readFileSync(generated, "utf8");
