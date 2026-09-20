@@ -9,9 +9,12 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src",
     "predev": "node scripts/build-worker.mjs",
-    "prebuild": "node scripts/build-worker.mjs",
+    "prebuild": "npm run api:types && node scripts/build-worker.mjs",
     "test:config": "node tests/configuration.cjs",
-    "test:ui": "node scripts/test-browser.mjs"
+    "test:ui": "node scripts/test-browser.mjs",
+    "api:types": "node scripts/generate-api-types.mjs",
+    "api:types:check": "node scripts/check-api-types.mjs",
+    "pretypecheck": "npm run api:types"
   },
   "dependencies": {
     "next": "^15.5.12",
@@ -25,6 +28,7 @@
     "@types/react-dom": "^19.2.0",
     "prettier": "^3.9.7",
     "typescript": "^5.9.3",
-    "playwright": "^1.62.1"
+    "playwright": "^1.62.1",
+    "openapi-typescript": "^7.10.1"
   }
 }
