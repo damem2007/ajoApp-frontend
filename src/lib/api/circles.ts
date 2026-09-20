@@ -1,3 +1,4 @@
+import type { components } from "../../generated/api-types";
 import { request, download } from "./client";
 import type {
   CircleDetail,
@@ -29,27 +30,8 @@ export function toFrequencyOptions(values: string[]): FrequencyOption[] {
     label: FREQUENCY_LABELS[value] ?? value,
   }));
 }
-export interface CircleSetup {
-  name_min_length: number;
-  name_max_length: number;
-  amount_max_minor: number;
-  members_min: number;
-  members_max: number;
-  default_currency: string;
-  currencies: string[];
-  contribution_frequencies: string[];
-  collection_frequencies: string[];
-  default_contribution_frequency: string;
-  default_collection_frequency: string;
-  allow_overflow: false;
-}
-export interface PlanPreview {
-  contribution_minor: number;
-  target_minor: number;
-  debit_dates: string[];
-  payout_dates: string[];
-  planned_members: number;
-}
+export type CircleSetup = components["schemas"]["CircleSetupResponse"];
+export type PlanPreview = components["schemas"]["PlanPreview"];
 
 export const circlesApi = {
   setup: () => request<CircleSetup>("/public/circle-setup"),
