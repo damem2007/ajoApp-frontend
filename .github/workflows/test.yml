@@ -1,0 +1,42 @@
+name: frontend
+
+on:
+  push:
+    branches: [main, "architecture/**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+      - name: Checkout matching backend contract
+        uses: actions/checkout@v4
+        with:
+          repository: damem2007/ajoApp
+          ref: ${{ github.ref_name == 'main' && 'main' || 'architecture/consolidated-upgrade' }}
+          path: backend-contract
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend-contract/pyproject.toml
+      - name: Install backend contract dependencies
+        run: python -m pip install -e './backend-contract[dev]'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Check generated API contract drift
+        env:
+          AJO_BACKEND_DIR: ${{ github.workspace }}/backend-contract
+        run: npm run api:types:check
+      - name: Type check
+        run: npm run typecheck
+      - name: Configuration tests
+        run: npm run test:config
+      - name: Production build
+        run: npm run build

@@ -25,3 +25,24 @@ Both marketplaces use the same component/catalogue API. Joining triggers authori
 `npm run test:config`, `npm run typecheck`, `npm run build`, and `AJO_UI_ORIGIN=<frontend-origin> npm run test:ui`. Browser writes use intercepted fictional fixtures. Install Playwright's Chromium or provide `AJO_BROWSER_EXECUTABLE`; machine-specific paths are not embedded. Python sandbox financial regressions run separately with isolated databases.
 
 See [architecture](../docs/ARCHITECTURE.md) and [configuration reference](../docs/CONFIGURATION.md).
+
+
+## FastAPI contract types
+
+FastAPI/Pydantic in the separate `ajoApp` backend is the source of truth for API contract types.
+The frontend keeps its handwritten HTTP resource functions and generates **types only** with
+`openapi-typescript`.
+
+With the backend repository available as the sibling `../backend`:
+
+```bash
+npm ci
+npm run api:types
+npm run api:types:check
+npm run typecheck
+npm run build
+```
+
+Generated definitions are committed at `src/generated/api-types.ts` and must not be edited
+manually. `api:types:check` generates into a temporary file and fails when the committed contract
+is stale; it does not modify the committed file. UI/form/view-model types remain handwritten.
