@@ -12,3 +12,6 @@ tmp/
 frontend/node_modules/
 frontend/.next/
 frontend/*.tsbuildinfo
+
+# Generated from FastAPI OpenAPI
+frontend/src/generated/api-types.ts
