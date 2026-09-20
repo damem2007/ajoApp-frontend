@@ -5,7 +5,7 @@ COPY backend ./backend
 COPY frontend/public ./frontend/public
 COPY migrations ./migrations
 COPY alembic.ini ./
-RUN pip install --no-cache-dir . && useradd --create-home ajo && mkdir /data && chown ajo:ajo /data
+RUN pip install --no-cache-dir '.[postgres]' && useradd --create-home ajo && mkdir /data && chown ajo:ajo /data
 USER ajo
 ENV AJO_FRONTEND_ASSETS=/srv/ajo/frontend/public/assets PYTHONPATH=/srv/ajo/backend AJO_PLATFORM_DATABASE_URL=sqlite:////data/ajo-platform.db AJO_DATA_DIR=/data/secrets
 EXPOSE 8000
