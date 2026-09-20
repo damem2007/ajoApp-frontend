@@ -1729,61 +1729,43 @@ export interface components {
              */
             name_min_length: number;
         };
-        /** CircleSetupResponse */
+        /**
+         * CircleSetupResponse
+         * @description Required public contract emitted from resolved policy configuration.
+         */
         CircleSetupResponse: {
             /**
              * Allow Overflow
-             * @default false
              * @constant
              */
             allow_overflow: false;
-            /**
-             * Amount Max Minor
-             * @default 100000000000
-             */
+            /** Amount Max Minor */
             amount_max_minor: number;
             /** Collection Frequencies */
-            collection_frequencies?: ("daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly")[];
+            collection_frequencies: ("daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly")[];
             /** Contribution Frequencies */
-            contribution_frequencies?: ("daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly")[];
+            contribution_frequencies: ("daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly")[];
             /** Currencies */
             currencies: string[];
             /**
              * Default Collection Frequency
-             * @default monthly
              * @enum {string}
              */
             default_collection_frequency: "daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly";
             /**
              * Default Contribution Frequency
-             * @default monthly
              * @enum {string}
              */
             default_contribution_frequency: "daily" | "weekly" | "bi-weekly" | "monthly" | "bi-monthly" | "quarterly" | "semi-annual" | "yearly";
-            /**
-             * Default Currency
-             * @default NGN
-             */
+            /** Default Currency */
             default_currency: string;
-            /**
-             * Members Max
-             * @default 50
-             */
+            /** Members Max */
             members_max: number;
-            /**
-             * Members Min
-             * @default 2
-             */
+            /** Members Min */
             members_min: number;
-            /**
-             * Name Max Length
-             * @default 80
-             */
+            /** Name Max Length */
             name_max_length: number;
-            /**
-             * Name Min Length
-             * @default 3
-             */
+            /** Name Min Length */
             name_min_length: number;
         };
         /** ComplaintInput */
