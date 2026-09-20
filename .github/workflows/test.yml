@@ -11,6 +11,8 @@ jobs:
     env:
       AJO_API_ORIGIN: http://127.0.0.1:9020
       NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:9020
+      NEXT_PUBLIC_REFRESH_INTERVAL_SECONDS: "30"
+      NEXT_PUBLIC_DEFAULT_PAGE_SIZE: "20"
     steps:
       - name: Checkout frontend
         uses: actions/checkout@v4
