@@ -45,7 +45,10 @@ def routes(ctx):
             return JSONResponse({'detail':'Registration rate limit exceeded'},status_code=429)
         if db.scalar(select(Account).where((Account.email==body.email.lower())|(Account.phone==body.phone))):
             return JSONResponse({'detail':'Account already exists'},status_code=409)
-        user=Account(email=body.email.lower(),phone=body.phone,password=password_hash(body.password))
+        if body.test_run_id and not ctx.sandbox:
+            fail('Test-run registration metadata is disabled outside sandbox mode',403)
+        user=Account(email=body.email.lower(),phone=body.phone,password=password_hash(body.password),
+                     source='test_cli' if body.test_run_id else 'app',test_run_id=body.test_run_id)
         db.add(user);db.flush()
         for channel in ['email','sms']: challenge(db,user,channel)
         audit(db,user,user.id,'registered')
