@@ -14,7 +14,7 @@ from .models import OutboxEvent
 
 
 PAYMENT_QUEUE = "ajo:payment"
-RECONCILIATION_QUEUE = "ajo:reconciliation"
+NOTIFICATION_QUEUE = "ajo:notification"\nRECONCILIATION_QUEUE = "ajo:reconciliation"
 
 
 def enqueue(db, *, event_type: str, aggregate_type: str, aggregate_id: str, payload: dict,
