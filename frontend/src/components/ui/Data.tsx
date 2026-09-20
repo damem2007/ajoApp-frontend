@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/providers/toast-provider";
 export function JsonView({ value }: { value: unknown }) {
   return <pre>{JSON.stringify(value, null, 2)}</pre>;
@@ -37,6 +37,7 @@ export function Table({
 export function useResource<T>(
   load: () => Promise<T>,
   dependencies: unknown[] = [],
+  options: { refreshIntervalMs?: number; retainValue?: boolean } = {},
 ) {
   const [value, setValue] = useState<T | null>(null),
     [error, setError] = useState(""),
@@ -44,7 +45,7 @@ export function useResource<T>(
     { notify } = useToast();
   useEffect(() => {
     let active = true;
-    setValue(null);
+    if (!options.retainValue) setValue(null);
     setError("");
     load()
       .then((value) => {
@@ -60,7 +61,13 @@ export function useResource<T>(
       active = false;
     };
   }, [...dependencies, version]);
-  return { value, error, reload: () => setVersion((v) => v + 1) };
+  const reload = useCallback(() => setVersion((v) => v + 1), []);
+  useEffect(() => {
+    if (!options.refreshIntervalMs) return;
+    const interval = setInterval(reload, options.refreshIntervalMs);
+    return () => clearInterval(interval);
+  }, [reload, options.refreshIntervalMs]);
+  return { value, error, reload };
 }
 export function Loading({ error }: { error?: string }) {
   return <p role="status">{error || "Loading…"}</p>;

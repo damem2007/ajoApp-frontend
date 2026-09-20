@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Form, { Field } from "@/components/ui/Form";
 import { frequencies } from "@/lib/frequencies";
@@ -7,6 +7,7 @@ import { amount } from "@/lib/money";
 import type { PlanPreview } from "@/lib/api/circles";
 import { circlesApi } from "@/lib/api/circles";
 import type { CircleConfig, FormValues } from "@/lib/types";
+import { useResource, Loading } from "@/components/ui/Data";
 import { Table } from "@/components/ui/Data";
 export default function CircleWizard({
   initial,
@@ -15,6 +16,7 @@ export default function CircleWizard({
   initial?: CircleConfig;
   id?: string;
 }) {
+  const { value: setup, error: setupError } = useResource(circlesApi.setup);
   const [preview, setPreview] = useState<PlanPreview | null>(null);
   const [step, setStep] = useState(0),
     [values, setValues] = useState<FormValues>({
@@ -39,8 +41,24 @@ export default function CircleWizard({
       hidden: initial?.identities_hidden ?? true,
     }),
     router = useRouter();
+  useEffect(() => {
+    if (setup && !initial)
+      setValues((v) => ({
+        ...v,
+        currency: setup.default_currency,
+        frequency: setup.default_contribution_frequency,
+        collection: setup.default_collection_frequency,
+        members: Math.min(
+          setup.members_max,
+          Math.max(setup.members_min, Number(v.members)),
+        ),
+      }));
+  }, [setup, initial]);
+  if (!setup) return <Loading error={setupError} />;
   const names = ["Your goal", "People & rhythm", "Circle rules", "Review"];
-  const options = frequencies.map((f) => [f.value, f.label] as const);
+  const options = frequencies
+    .filter((f) => setup.contribution_frequencies.includes(f.value))
+    .map((f) => [f.value, f.label] as const);
   const fields: Field[][] = [
     [
       {
@@ -54,7 +72,8 @@ export default function CircleWizard({
         name: "name",
         label: "Give your circle a name",
         value: String(values.name),
-        minLength: 3,
+        minLength: setup.name_min_length,
+        maxLength: setup.name_max_length,
       },
       {
         name: "description",
@@ -68,7 +87,7 @@ export default function CircleWizard({
         label: "Currency",
         type: "select",
         value: String(values.currency),
-        options: ["CAD", "NGN", "USD", "GBP"],
+        options: setup.currencies,
       },
       {
         name: "contribution",
@@ -76,6 +95,7 @@ export default function CircleWizard({
         type: "number",
         value: Number(values.contribution),
         min: 0.01,
+        max: setup.amount_max_minor / 100,
         step: "0.01",
       },
     ],
@@ -85,8 +105,8 @@ export default function CircleWizard({
         label: "Number of people (including you)",
         type: "number",
         value: Number(values.members),
-        min: 2,
-        max: 50,
+        min: setup.members_min,
+        max: setup.members_max,
       },
       {
         name: "frequency",
@@ -100,7 +120,9 @@ export default function CircleWizard({
         label: "How often will someone receive a payout?",
         type: "select",
         value: String(values.collection),
-        options,
+        options: frequencies
+          .filter((f) => setup.collection_frequencies.includes(f.value))
+          .map((f) => [f.value, f.label] as const),
       },
       {
         name: "start",

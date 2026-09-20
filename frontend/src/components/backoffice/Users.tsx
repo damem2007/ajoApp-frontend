@@ -3,12 +3,14 @@ import { adminApi } from "@/lib/api/admin";
 import { useResource, Loading } from "@/components/ui/Data";
 import Form from "@/components/ui/Form";
 import { useToast } from "@/providers/toast-provider";
+import StaffOnboarding from "./StaffOnboarding";
 export default function Users() {
   const { value, error, reload } = useResource(adminApi.users),
     { notify } = useToast();
   return (
     <>
       <h2>Users</h2>
+      <StaffOnboarding />
       {value ? (
         value.map((u) => (
           <article className="card" key={u.id}>

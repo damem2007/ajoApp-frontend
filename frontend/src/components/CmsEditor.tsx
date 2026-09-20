@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import { cmsApi } from "@/lib/api/cms";
 import { authApi } from "@/lib/api/auth";
-import type { CmsState, RevisionSummary } from "@/lib/cms-types";
+import type {
+  CmsState,
+  RevisionSummary,
+  MarketingContent,
+} from "@/lib/cms-types";
 type Value = string | Value[] | { [key: string]: Value };
 const friendly = (key: string) =>
   ({
@@ -107,7 +111,7 @@ function Field({
 }
 export default function CmsEditor() {
   const [state, setState] = useState<CmsState | null>(null),
-    [working, setWorking] = useState<{ [key: string]: Value }>({}),
+    [working, setWorking] = useState<MarketingContent | null>(null),
     [history, setHistory] = useState<RevisionSummary[]>([]),
     [role, setRole] = useState(""),
     [dirty, setDirty] = useState(false),
@@ -116,9 +120,7 @@ export default function CmsEditor() {
     [busy, setBusy] = useState(false);
   async function adopt(next: CmsState) {
     setState(next);
-    setWorking(
-      structuredClone(next.draft.content) as unknown as Record<string, Value>,
-    );
+    setWorking(structuredClone(next.draft.content));
     setDirty(false);
     setHistory(await cmsApi.history());
   }
@@ -165,7 +167,7 @@ export default function CmsEditor() {
           </button>
         </div>
       )}
-      {state ? (
+      {state && working ? (
         <>
           <p className="cms-status">
             {dirty
@@ -219,7 +221,9 @@ export default function CmsEditor() {
                   value={value}
                   path={key}
                   change={(v) => {
-                    setWorking({ ...working, [key]: v });
+                    setWorking((current) =>
+                      current ? { ...current, [key]: v } : current,
+                    );
                     setDirty(true);
                   }}
                 />

@@ -5,9 +5,9 @@ export const cmsApi = {
   history: () => request<RevisionSummary[]>("/admin/content/home/revisions"),
   preview: () =>
     request<{ revision_id: string; content: MarketingContent }>(
-      "/admin/content/home/preview-data",
+      "/admin/content/home/preview",
     ),
-  save: (content: unknown, expected_draft: string, reason: string) =>
+  save: (content: MarketingContent, expected_draft: string, reason: string) =>
     request<CmsState>("/admin/content/home/draft", {
       method: "PUT",
       body: { content, expected_draft, reason },

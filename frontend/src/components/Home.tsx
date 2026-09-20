@@ -1,15 +1,20 @@
 "use client";
 import type { MarketingContent } from "@/lib/cms-types";
 import { useState, useEffect } from "react";
-import {catalogue,Circle} from "@/lib/api/marketplace";
-import {amount} from "@/lib/money";
-import { frequencies } from "@/lib/frequencies";
+import { catalogue, Circle } from "@/lib/api/marketplace";
+import { amount } from "@/lib/money";
+import { circlesApi, toFrequencyOptions, type FrequencyOption } from "@/lib/api/circles";
 export default function Home({ content: c }: { content: MarketingContent }) {
+  const FALLBACK_FREQUENCIES: FrequencyOption[] = [
+    { value: "monthly", label: "Monthly" },
+  ];
   const [contribution, setContribution] = useState(200),
     [members, setMembers] = useState(6),
     [turn, setTurn] = useState(3),
     [currency, setCurrency] = useState("CAD"),
     [frequency, setFrequency] = useState("monthly"),
+    [frequencies, setFrequencies] = useState<FrequencyOption[]>(FALLBACK_FREQUENCIES),
+    [frequencyError, setFrequencyError] = useState(false),
     [circles, setCircles] = useState<Circle[]>([]),
     [error, setError] = useState("");
   useEffect(() => {
@@ -20,6 +25,18 @@ export default function Home({ content: c }: { content: MarketingContent }) {
           "We couldn’t load circles. Please visit the marketplace to try again.",
         ),
       );
+  }, []);
+  useEffect(() => {
+    circlesApi
+      .setup()
+      .then((setup) => {
+        const options = toFrequencyOptions(setup.contribution_frequencies);
+        if (options.length) {
+          setFrequencies(options);
+          setFrequency(setup.default_contribution_frequency);
+        }
+      })
+      .catch(() => setFrequencyError(true));
   }, []);
   const pot = contribution * members * 100,
     ordinal = (n: number) =>
@@ -193,6 +210,11 @@ export default function Home({ content: c }: { content: MarketingContent }) {
                       </option>
                     ))}
                   </select>
+                  {frequencyError && (
+                    <p role="status" className="note">
+                      Showing default frequency — couldn't load live options.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="currency">{label("currency")}</label>

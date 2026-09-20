@@ -1,10 +1,11 @@
+import { backendOrigin } from "./backend-origin";
 import { NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
-  const origin = process.env.AJO_API_ORIGIN || "http://127.0.0.1:8000",
-    headers = new Headers(request.headers);
+  const headers = new Headers(request.headers);
   for (const key of ["host", "content-length", "connection", "accept-encoding"])
     headers.delete(key);
   try {
+    const origin = backendOrigin();
     const upstream = await fetch(
         origin + request.nextUrl.pathname + request.nextUrl.search,
         {

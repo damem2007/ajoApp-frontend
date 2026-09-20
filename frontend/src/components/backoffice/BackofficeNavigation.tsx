@@ -15,6 +15,20 @@ export const modules = [
   ["data-requests", "Data requests"],
   ["audit", "Audit"],
 ] as const;
+const modulePermissions: Record<string, string> = {
+  overview: "metrics.view",
+  users: "members.view",
+  kyc: "compliance.view",
+  circles: "circles.view",
+  payments: "payments.view",
+  complaints: "support.view",
+  policies: "settings.view",
+  jobs: "payments.manage",
+  deliveries: "notifications.view",
+  "data-requests": "compliance.manage",
+  audit: "audit.view",
+  cms: "content.edit",
+};
 export default function BackofficeNavigation() {
   const pathname = usePathname(),
     { user } = useSession();
@@ -31,20 +45,26 @@ export default function BackofficeNavigation() {
           ...(user && ["admin", "ops"].includes(user.role)
             ? [["cms", "Website CMS"]]
             : []),
-        ].map(([key, label]) => {
-          const href =
-            key === "overview" ? "/backoffice" : "/backoffice/" + key;
-          if (pathname.endsWith("/cms/preview")) return null;
-          return (
-            <Link
-              key={key}
-              href={href}
-              className={pathname === href ? "active" : "secondary"}
-            >
-              {label}
-            </Link>
-          );
-        })}
+        ]
+          .filter(
+            ([key]) =>
+              !user?.permissions ||
+              user.permissions.includes(modulePermissions[key]),
+          )
+          .map(([key, label]) => {
+            const href =
+              key === "overview" ? "/backoffice" : "/backoffice/" + key;
+            if (pathname.endsWith("/cms/preview")) return null;
+            return (
+              <Link
+                key={key}
+                href={href}
+                className={pathname === href ? "active" : "secondary"}
+              >
+                {label}
+              </Link>
+            );
+          })}
       </nav>
     </>
   );

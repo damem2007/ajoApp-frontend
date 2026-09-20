@@ -7,6 +7,42 @@ import type {
   Json,
   Agreement,
 } from "../types";
+export interface FrequencyOption {
+  value: string;
+  label: string;
+}
+// Backend returns raw values (e.g. "weekly", "monthly") in
+// CircleSetup.contribution_frequencies — map them to display labels here.
+const FREQUENCY_LABELS: Record<string, string> = {
+  daily: "Daily",
+  weekly: "Weekly",
+  "bi-weekly": "Bi-weekly",
+  monthly: "Monthly",
+  "bi-monthly": "Bi-monthly",
+  quarterly: "Quarterly",
+  "semi-annual": "Semi-annual",
+  yearly: "Yearly",
+};
+export function toFrequencyOptions(values: string[]): FrequencyOption[] {
+  return values.map((value) => ({
+    value,
+    label: FREQUENCY_LABELS[value] ?? value,
+  }));
+}
+export interface CircleSetup {
+  name_min_length: number;
+  name_max_length: number;
+  amount_max_minor: number;
+  members_min: number;
+  members_max: number;
+  default_currency: string;
+  currencies: string[];
+  contribution_frequencies: string[];
+  collection_frequencies: string[];
+  default_contribution_frequency: string;
+  default_collection_frequency: string;
+  allow_overflow: false;
+}
 export interface PlanPreview {
   contribution_minor: number;
   target_minor: number;
@@ -14,7 +50,9 @@ export interface PlanPreview {
   payout_dates: string[];
   planned_members: number;
 }
+
 export const circlesApi = {
+  setup: () => request<CircleSetup>("/public/circle-setup"),
   preview: (body: unknown) =>
     request<PlanPreview>("/circles/preview", { body }),
   list: () => request<CircleDetail[]>("/circles"),

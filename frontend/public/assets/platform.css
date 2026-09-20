@@ -7,3 +7,40 @@
 .cms-group{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:14px 0}.cms-group>summary{font-size:17px}.cms-field{margin:12px 0}.cms-field textarea{min-height:100px}.cms-item{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}.cms-status{padding:12px 16px;border-radius:8px;background:#edf3ed}.cms-revision{border-top:1px solid var(--border);padding:14px 0}.cms-revision p{font-size:12px;margin:5px 0}.header-tools{margin-left:auto}
 
 .shell>nav a{display:block;padding:12px 16px;color:inherit;border-radius:8px;text-decoration:none}.shell>nav a.active,.actions a.active{background:#145343;color:white}.actions a,.button{display:inline-flex;align-items:center;padding:10px 16px;border-radius:8px;border:1px solid #d2dfd5;text-decoration:none;color:inherit}.actions a.active{color:white}.shell>nav a:focus-visible,.actions a:focus-visible{outline:3px solid #c1793f;outline-offset:2px}
+
+/* Shared password field: visibility controls remain independent of submission. */
+.password-field-wrap { display:block; position:relative; }
+.password-field-wrap input { padding-right:3.25rem; width:100%; }
+.password-field-wrap .password-visibility { position:absolute; right:.4rem; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:2.5rem; height:2.5rem; padding:.5rem; border:0; background:transparent; color:inherit; }
+.password-visibility svg { width:1.25rem; height:1.25rem; }
+.password-visibility:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.password-strength { display:flex; align-items:center; gap:.65rem; margin-top:.5rem; font-size:.875rem; }
+.password-strength-bar { display:block; height:.35rem; width:4rem; border-radius:1rem; background:#a33e3e; }
+.password-strength-3, .password-strength-4 { background:#b16b24; }
+.password-strength-5 { background:#23805c; }
+
+/* StockData notification presentation, using Ajo's colours and existing actions. */
+.notification-panel { top:calc(100% + .65rem); width:min(430px,calc(100vw - 2rem)); padding:0; overflow:hidden; border-radius:16px; box-shadow:0 16px 45px rgba(15,23,42,.16); }
+.notification-dropdown-header { display:grid; gap:.75rem; padding:.85rem; border-bottom:1px solid #d4dfd7; }
+.notification-heading { display:flex; justify-content:space-between; align-items:center; gap:.5rem; border-radius:999px; background:#edf2ed; padding:.5rem .75rem; }
+.notification-panel .notification-heading h2 { font-size:.9rem; margin:0; }
+.notification-read-label { border:1px solid #d4dfd7; border-radius:999px; padding:.12rem .42rem; font-size:.68rem; color:#647569; white-space:nowrap; }
+.notification-dropdown-header p { margin:0; font-size:.76rem; line-height:1.35; }
+.notification-list { display:grid; max-height:min(430px,55vh); overflow-y:auto; padding:.35rem .75rem .75rem; }
+.card.notification-item { display:grid; grid-template-columns:22px minmax(0,1fr); gap:.7rem; align-items:start; padding:.75rem .5rem; border-radius:12px; border:0; box-shadow:none; margin:0; }
+.notification-item:hover { background:#edf2ed; }
+.notification-dot { height:9px; width:9px; margin:7px auto 0; border-radius:50%; background:#145343; box-shadow:0 0 0 3px #14534315; }
+.notification-item.read .notification-dot { background:#89968e; box-shadow:0 0 0 3px #89968e15; }
+.notification-item.read .notification-content>h2, .notification-item.read .notification-content>p { opacity:.65; }
+.notification-content { min-width:0; overflow-wrap:anywhere; }
+.card.notification-item h2 { font-size:.88rem; line-height:1.25; margin:0; }
+.card.notification-item p { font-size:.76rem; line-height:1.35; margin:.22rem 0; }
+.notification-meta-row { display:flex; gap:.5rem; align-items:center; margin:.35rem 0; }
+.notification-item small { color:#647569; font-size:.72rem; }
+.notification-item button.secondary { min-height:32px; padding:.35rem .65rem; font-size:.75rem; }
+.notification-item summary { cursor:pointer; font-size:.75rem; }
+.notification-footer { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.75rem .85rem; border-top:1px solid #d4dfd7; }
+.notification-footer a { font-size:.8rem; }
+.notification-footer button.secondary { min-height:32px; padding:.35rem .65rem; font-size:.75rem; }
+.notification-empty { padding:1rem .25rem; color:#647569; }
+@media(max-width:650px) { .notification-panel { position:fixed; top:80px; right:1rem; } }

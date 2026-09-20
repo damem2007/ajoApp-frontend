@@ -34,8 +34,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           className={"toast " + (toast.error ? "error" : "success")}
           role={toast.error ? "alert" : "status"}
         >
-          <strong>{toast.error ? "Please check this" : "Update"}</strong>
-          <p>{toast.text}</p>
+          <span className="toast-indicator" aria-hidden="true">
+            {toast.error ? "!" : "✓"}
+          </span>
+          <div className="toast-content">
+            <strong>{toast.error ? "Please check this" : "Update"}</strong>
+            <p>{toast.text}</p>
+          </div>
           <button className="secondary" onClick={() => setToast(null)}>
             Dismiss
           </button>

@@ -13,6 +13,32 @@ import type {
   PolicyVersion,
 } from "../types";
 export const adminApi = {
+  channels: () =>
+    request<{ id: string; display_name: string; enabled: boolean }[]>(
+      "/admin/channels",
+    ),
+  updateChannel: (id: string, body: FormValues) =>
+    request<Json>("/admin/channels/" + id, { method: "PUT", body }),
+  staffInvitations: () =>
+    request<
+      {
+        id: string;
+        email: string;
+        role: string;
+        status: string;
+        created_by: string;
+        created_at: string;
+      }[]
+    >("/admin/staff-invitations"),
+  inviteStaff: (body: FormValues) =>
+    request<Json>("/admin/staff-invitations", { body }),
+  acceptStaff: (token: string) =>
+    request<Json>("/auth/staff-invitations/accept", { body: { token } }),
+  testStaffInbox: () =>
+    request<{ id: string; token: string; role: string }[]>(
+      "/auth/staff-invitations/test-inbox",
+    ),
+
   metrics: () => request<Record<string, Json>>("/admin/metrics"),
   users: () => request<Account[]>("/admin/users"),
   userStatus: (id: string, body: FormValues) =>
@@ -44,6 +70,15 @@ export const adminApi = {
   evidence: (id: string) => request<Json>(`/admin/complaints/${id}/evidence`),
   resolve: (id: string, body: FormValues) =>
     request<Json>(`/admin/complaints/${id}/resolve`, { body }),
+  participantConfig: () =>
+    request<{
+      policy_version: number;
+      tiers: { score: number; cap: number }[];
+    }>("/admin/participant-config"),
+  saveParticipantConfig: (
+    tiers: { score: number; cap: number }[],
+    reason: string,
+  ) => request<Json>("/admin/participant-config", { body: { tiers, reason } }),
   policies: () => request<PolicyVersion[]>("/admin/policies"),
   policy: (policy: Json, reason: string) =>
     request<Json>("/admin/policies", { body: { policy, reason } }),

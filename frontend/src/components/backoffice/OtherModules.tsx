@@ -4,6 +4,9 @@ import { adminApi } from "@/lib/api/admin";
 import { useResource, Loading, JsonView, Table } from "@/components/ui/Data";
 import Form from "@/components/ui/Form";
 import { useToast } from "@/providers/toast-provider";
+import ParticipantConfig from "./ParticipantConfig";
+import ChannelSetup from "./ChannelSetup";
+import SystemSetup from "./SystemSetup";
 import type { Json } from "@/lib/types";
 export function Overview() {
   const { value, error } = useResource(adminApi.metrics);
@@ -32,7 +35,10 @@ export function Policies() {
     { notify } = useToast();
   return (
     <>
-      <h2>Policies</h2>
+      <h2>System setup & policies</h2>
+      <SystemSetup />
+      <ParticipantConfig onSaved={reload} />
+      <ChannelSetup />
       <p>
         Changes create a new policy version. Existing contracts retain their
         frozen rules. Unresolved values remain null.

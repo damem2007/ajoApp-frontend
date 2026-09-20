@@ -7,6 +7,7 @@ export interface Account {
   phone: string;
   pseudonym: string;
   role: Role;
+  permissions?: string[];
   email_verified: boolean;
   phone_verified: boolean;
   kyc_status: string;

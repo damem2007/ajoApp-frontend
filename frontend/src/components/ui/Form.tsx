@@ -1,6 +1,7 @@
 "use client";
 import { useState, useId } from "react";
 import type { FormValues } from "@/lib/types";
+import { PasswordField, type PasswordPolicy } from "@/lib/password-field";
 import { ApiError } from "@/lib/api/client";
 import { useToast } from "@/providers/toast-provider";
 export type Field = {
@@ -24,6 +25,10 @@ export type Field = {
   max?: number;
   step?: string;
   minLength?: number;
+  maxLength?: number;
+  autoComplete?: "current-password" | "new-password";
+  showStrength?: boolean;
+  passwordPolicy?: PasswordPolicy;
 };
 export default function Form({
   fields,
@@ -103,8 +108,20 @@ export default function Form({
             };
           return (
             <div key={field.name}>
-              <label htmlFor={id}>{field.label}</label>
-              {field.type === "select" ? (
+              {field.type !== "password" && (
+                <label htmlFor={id}>{field.label}</label>
+              )}
+              {field.type === "password" ? (
+                <PasswordField
+                  {...props}
+                  label={field.label}
+                  minLength={field.minLength}
+                  maxLength={field.maxLength}
+                  autoComplete={field.autoComplete || "current-password"}
+                  showStrength={field.showStrength}
+                  policy={field.passwordPolicy}
+                />
+              ) : field.type === "select" ? (
                 <select {...props}>
                   {field.options?.map((option) => {
                     const [value, text] =
@@ -133,9 +150,7 @@ export default function Form({
                   max={field.max}
                   step={field.step || "1"}
                   minLength={field.minLength}
-                  autoComplete={
-                    field.type === "password" ? "current-password" : undefined
-                  }
+                  maxLength={field.maxLength}
                 />
               )}{" "}
               {errors[field.name] && (

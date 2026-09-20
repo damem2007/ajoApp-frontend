@@ -37,6 +37,9 @@ export default function AuthScreen({
               label: register ? "Password (12+ characters)" : "Password",
               type: "password",
               minLength: register ? 12 : undefined,
+              maxLength: 128,
+              autoComplete: register ? "new-password" : "current-password",
+              showStrength: register,
             },
             ...(!register
               ? [{ name: "totp", label: "MFA code (optional)", optional: true }]
