@@ -15,8 +15,8 @@ execFileSync("python", [resolve(root, "scripts/export_openapi.py"), "--output", 
   env: { ...process.env, PYTHONPATH: resolve(root, "backend") },
 });
 execFileSync(
-  resolve(process.cwd(), "node_modules/.bin/openapi-typescript"),
-  [schema, "-o", output],
+  "npx",
+  ["--yes", "openapi-typescript@7.10.1", schema, "-o", output],
   { cwd: process.cwd(), stdio: "inherit" },
 );
 rmSync(resolve(root, ".generated"), { recursive: true, force: true });
