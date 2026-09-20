@@ -1,21 +1,134 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ajo}
+      POSTGRES_USER: ${POSTGRES_USER:-ajo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ajo-dev-only}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ajo} -d ${POSTGRES_DB:-ajo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ajo-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ajo-redis:/data
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment: &backend-env
+      AJO_DEMO_MODE: "true"
+      AJO_PLATFORM_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-ajo}:${POSTGRES_PASSWORD:-ajo-dev-only}@postgres:5432/${POSTGRES_DB:-ajo}
+      AJO_REDIS_URL: redis://redis:6379/0
+      AJO_DATA_DIR: /data/secrets
+      AJO_DEGRADED_SQLITE_PATH: /data/ajo-degraded.db
+      AJO_PAYMENT_PROVIDER: sandbox
+      AJO_IDENTITY_PROVIDER: sandbox
+      AJO_NOTIFICATION_PROVIDER: sandbox
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL:-admin@ajo.local}
+      SUPERADMIN_PHONE: ${SUPERADMIN_PHONE:-+15550100000}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:-ChangeThisLocalPassword123!}
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build: .
-    environment:
-      AJO_DEMO_MODE: 'true'
-      AJO_PLATFORM_DATABASE_URL: sqlite:////data/ajo-platform.db
-      AJO_DATA_DIR: /data/secrets
+    command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment: *backend-env
     volumes:
-      - ajo-data:/data
+      - ajo-runtime:/data
     ports:
-      - '8000:8000'
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  payment-worker:
+    build: .
+    command: ["python", "-m", "app.platform.workers", "payment"]
+    environment: *backend-env
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  notification-worker:
+    build: .
+    command: ["python", "-m", "app.platform.workers", "notification"]
+    environment: *backend-env
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  reconciliation-worker:
+    build: .
+    command: ["python", "-m", "app.platform.workers", "reconciliation"]
+    environment: *backend-env
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  outbox-worker:
+    build: .
+    command: ["python", "-m", "app.platform.workers", "outbox"]
+    environment: *backend-env
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  scheduler:
+    build: .
+    command: ["python", "-m", "app.platform.workers", "scheduler"]
+    environment: *backend-env
+    volumes:
+      - ajo-runtime:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
   frontend:
     build: ./frontend
     environment:
       AJO_API_ORIGIN: http://backend:8000
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       - backend
+
 volumes:
-  ajo-data:
+  ajo-postgres:
+  ajo-redis:
+  ajo-runtime:
