@@ -2,9 +2,19 @@
 import Form, { type Field } from "@/components/ui/Form";
 import { useResource, Loading } from "@/components/ui/Data";
 import { adminApi } from "@/lib/api/admin";
-import { circlesApi } from "@/lib/api/circles";
+import { circlesApi, type CircleSetup } from "@/lib/api/circles";
 import { frequencies } from "@/lib/frequencies";
 import { useToast } from "@/providers/toast-provider";
+
+type Frequency = CircleSetup["default_contribution_frequency"];
+
+function frequency(value: unknown): Frequency {
+  const candidate = String(value);
+  const matched = frequencies.find((item) => item.value === candidate);
+  if (!matched) throw Error("Unsupported contribution/collection frequency");
+  return matched.value;
+}
+
 export default function SystemSetup() {
   const state = useResource(circlesApi.setup);
   const policies = useResource(adminApi.policies);
@@ -100,10 +110,10 @@ export default function SystemSetup() {
           circle_setup.default_currency = String(
             v.default_currency,
           ).toUpperCase();
-          circle_setup.default_contribution_frequency = String(
+          circle_setup.default_contribution_frequency = frequency(
             v.default_contribution_frequency,
           );
-          circle_setup.default_collection_frequency = String(
+          circle_setup.default_collection_frequency = frequency(
             v.default_collection_frequency,
           );
           circle_setup.contribution_frequencies = frequencies
