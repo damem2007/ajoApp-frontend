@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, Request, Response
 from sqlalchemy import select
 from .models import Account, Circle, Participant, Invitation, Contract, Signature, Due, Bank, IdentityCase
-from .schemas import CircleInput, InviteInput, JoinInput, FinalizeInput, SignInput, Reason
+from .schemas import CircleInput, CircleSetup, InviteInput, JoinInput, FinalizeInput, SignInput, Reason
 from .security import secret, digest, canonical
 from .calendar import schedule
 from .contracts import render_contract
@@ -16,6 +16,24 @@ from .services import (get,rows,fail,audit,notify,participants,eligible,require_
 def routes(ctx):
     router=APIRouter(prefix='/api/v1',tags=['Circles and contracts'])
     dbdep=ctx.session
+
+    @router.get('/public/circle-setup', response_model=CircleSetup)
+    def circle_setup(db=Depends(dbdep)):
+        p=policy(db).data
+        return CircleSetup(
+            name_min_length=3,
+            name_max_length=80,
+            amount_max_minor=100_000_000_000,
+            members_min=2,
+            members_max=50,
+            default_currency='NGN',
+            currencies=p['currencies'],
+            contribution_frequencies=['daily','weekly','bi-weekly','monthly','bi-monthly','quarterly','semi-annual','yearly'],
+            collection_frequencies=['daily','weekly','bi-weekly','monthly','bi-monthly','quarterly','semi-annual','yearly'],
+            default_contribution_frequency='monthly',
+            default_collection_frequency='monthly',
+            allow_overflow=False,
+        )
 
     def contract_access(db,con,user):
         if user.role in ['admin','ops','compliance']: return
