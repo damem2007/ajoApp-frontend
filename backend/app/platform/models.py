@@ -25,6 +25,8 @@ class Account(Base):
     mfa_enabled = Column(Boolean, default=False, nullable=False)
     mfa_counter = Column(BigInteger, default=-1, nullable=False)
     preferences = Column(JSON, default=dict, nullable=False)
+    source = Column(String, default='app', nullable=False)
+    test_run_id = Column(String, index=True)
     created_at = Column(String, default=now, nullable=False)
 
 class SessionToken(Base):
