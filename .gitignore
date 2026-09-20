@@ -1,14 +1,34 @@
-.venv/
-__pycache__/
-.pytest_cache/
-*.db
-*.db-*
-.ajo-data/
-.env
-.DS_Store
-*.egg-info/
-tmp/
+# dependencies
+/node_modules/
 
-frontend/node_modules/
-frontend/.next/
-frontend/*.tsbuildinfo
+# Next.js build output
+/.next/
+/.next-*/
+/out/
+/build/
+
+# local environment
+.env.local
+.env.*.local
+
+# keep example environment file
+!.env.example
+
+# Vercel
+.vercel/
+
+# TypeScript generated files
+*.tsbuildinfo
+next-env.d.ts
+
+# test/build artifacts
+/output/
+
+# OS
+.DS_Store
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

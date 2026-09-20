@@ -1,12 +1,18 @@
-FROM python:3.12-slim
-WORKDIR /srv/ajo
-COPY pyproject.toml README.md ./
-COPY backend ./backend
-COPY frontend/public ./frontend/public
-COPY migrations ./migrations
-COPY alembic.ini ./
-RUN pip install --no-cache-dir . && useradd --create-home ajo && mkdir /data && chown ajo:ajo /data
-USER ajo
-ENV AJO_FRONTEND_ASSETS=/srv/ajo/frontend/public/assets PYTHONPATH=/srv/ajo/backend AJO_PLATFORM_DATABASE_URL=sqlite:////data/ajo-platform.db AJO_DATA_DIR=/data/secrets
-EXPOSE 8000
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+ARG AJO_ALLOWED_DEV_ORIGINS
+ENV AJO_ALLOWED_DEV_ORIGINS=$AJO_ALLOWED_DEV_ORIGINS
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_REFRESH_INTERVAL_SECONDS
+ARG NEXT_PUBLIC_DEFAULT_PAGE_SIZE
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL NEXT_PUBLIC_REFRESH_INTERVAL_SECONDS=$NEXT_PUBLIC_REFRESH_INTERVAL_SECONDS NEXT_PUBLIC_DEFAULT_PAGE_SIZE=$NEXT_PUBLIC_DEFAULT_PAGE_SIZE
+RUN npm run build
+FROM node:22-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app .
+USER node
+CMD ["npm", "run", "start"]

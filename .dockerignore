@@ -1,11 +1,6 @@
+node_modules
+.next*
 .git
-.venv
-__pycache__
-*.db
-.env
-.ajo-data
-.pytest_cache
-tmp
-
-frontend/node_modules
-frontend/.next
+.env*
+*.tsbuildinfo
+output
