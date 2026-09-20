@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const root = process.cwd();
-const committed = resolve(root, "src", "generated", "api-types.ts");
+const committed = resolve(process.env.AJO_COMMITTED_API_TYPES || join(root, "src", "generated", "api-types.ts"));
 const temp = mkdtempSync(join(tmpdir(), "ajo-types-check-"));
 const expected = join(temp, "api-types.ts");
 

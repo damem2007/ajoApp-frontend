@@ -39,6 +39,10 @@ jobs:
         env:
           AJO_BACKEND_DIR: ${{ github.workspace }}/backend-contract
         run: npm run api:types:check
+      - name: Prove stale API contract fails
+        env:
+          AJO_BACKEND_DIR: ${{ github.workspace }}/backend-contract
+        run: npm run test:api-types
       - name: Type check
         run: npm run typecheck
       - name: Configuration tests
