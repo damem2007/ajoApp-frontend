@@ -1,3 +1,4 @@
+import type { components } from "../../generated/api-types";
 import { request, download } from "./client";
 import type {
   CircleDetail,
@@ -43,6 +44,8 @@ export interface CircleSetup {
   default_collection_frequency: string;
   allow_overflow: false;
 }
+export type CircleSetup = components["schemas"]["CircleSetup"];
+
 export interface PlanPreview {
   contribution_minor: number;
   target_minor: number;
@@ -52,6 +55,7 @@ export interface PlanPreview {
 }
 
 export const circlesApi = {
+  setup: () => request<CircleSetup>("/public/circle-setup"),
   setup: () => request<CircleSetup>("/public/circle-setup"),
   preview: (body: unknown) =>
     request<PlanPreview>("/circles/preview", { body }),
