@@ -259,3 +259,18 @@ class ContentRevision(Base):
     author_id = Column(String, ForeignKey('accounts.id'))
     reason = Column(String, nullable=False)
     created_at = Column(String, default=now, nullable=False)
+
+
+class OutboxEvent(Base):
+    __tablename__ = 'outbox_events'
+    id = Column(String, primary_key=True, default=uid)
+    event_type = Column(String, nullable=False, index=True)
+    aggregate_type = Column(String, nullable=False)
+    aggregate_id = Column(String, nullable=False, index=True)
+    payload = Column(JSON, nullable=False)
+    idempotency_key = Column(String, unique=True, nullable=False)
+    status = Column(String, default='Pending', nullable=False, index=True)
+    attempt_count = Column(Integer, default=0, nullable=False)
+    last_error = Column(Text)
+    created_at = Column(String, default=now, nullable=False)
+    published_at = Column(String)
